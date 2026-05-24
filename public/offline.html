@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Offline — Squawk</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 1rem;
+      background: #0f172a; color: #94a3b8;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 2rem; text-align: center;
+    }
+    svg { width: 64px; height: 64px; opacity: 0.5; }
+    h1 { color: #f8fafc; font-size: 1.25rem; }
+    p { font-size: 0.875rem; max-width: 280px; line-height: 1.6; }
+    button {
+      margin-top: 1rem; padding: 0.75rem 1.5rem; border-radius: 0.75rem;
+      border: none; background: #7c3aed; color: white; font-weight: 600;
+      font-size: 0.875rem; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+  <h1>You're offline</h1>
+  <p>Squawk needs a network connection to find peers. Your saved messages are still available.</p>
+  <button onclick="location.reload()">Retry</button>
+</body>
+</html>

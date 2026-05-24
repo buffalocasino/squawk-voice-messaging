@@ -1,0 +1,24 @@
+{
+  "name": "squawk-voice-messaging",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host"
+  },
+  "dependencies": {
+    "@matrix-org/olm": "^3.2.15",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "svelte": "^5.0.0",
+    "tailwindcss": "^4.0.0",
+    "vite": "^6.0.0",
+    "vite-plugin-pwa": "^1.0.0",
+    "workbox-window": "^7.0.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
+}
