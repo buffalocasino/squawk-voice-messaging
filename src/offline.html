@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Offline - Squawk Voice Messaging</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #1a1a1a;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: #1a73e8;
+        }
+        p {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1a5bb5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Offline Messaging</h1>
+        <p>You are currently offline, but you can still send messages!</p>
+        <p>Use the form below to queue up your voice messages. They will send automatically when connectivity is restored.</p>
+        <form id="offline-form">
+            <input type="text" id="message-text" placeholder="Enter message text..." style="width: 90%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc; background-color: #2c2c2c; color: white;">
+            <button type="submit">Queue Message</button>
+        </form>
+        <div id="status" style="margin-top: 20px; color: #aaa;">Status: Ready to queue.</div>
+    </div>
+</body>
+</html>

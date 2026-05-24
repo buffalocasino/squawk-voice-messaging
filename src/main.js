@@ -22,7 +22,10 @@ const updateSW = registerSW({
     if (confirm('New version available. Reload to update?')) {
       updateSW(true)
     }
+  },
+  onOfflineReady() {
+    console.info('App ready to work offline')
   }
-})
+});
 
 export default app

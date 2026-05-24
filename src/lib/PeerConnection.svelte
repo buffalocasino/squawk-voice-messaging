@@ -1,8 +1,7 @@
 <script>
   import { connectionStatus, myPeerId, contacts, messages } from '../stores.js'
-  import { initOlm, loadOrCreateIdentityKeys } from './crypto/olm.js'
+  import { initOlm, loadOrCreateIdentityKeys, getKeyBundle } from './crypto/olm.js'
   import { getOrCreateSession, encryptForPeer, decryptFromPeer, hasSession } from './crypto/sessionManager.js'
-  import { getKeyBundle } from './crypto/sessionManager.js'
   import { registerSender } from './crypto/sender.js'
 
   // Message queue for handling session-init race conditions
@@ -17,11 +16,10 @@
   let OlmInitialized = $state(false)
 
   async function ensureOlm() {
-    if (!OlmInitialized) {
-      await loadOrCreateIdentityKeys()
-      await initOlm()
-      OlmInitialized = true
-    }
+    if (OlmInitialized) return
+    await initOlm()
+    await loadOrCreateIdentityKeys()
+    OlmInitialized = true
   }
 
   function generatePeerId() {
@@ -76,7 +74,7 @@
             identityKey: msg.identityKey,
             oneTimeKey: msg.oneTimeKey,
           })
-          const plaintext = await decryptFromPeer(msg.from, msg.ciphertext)
+          const plaintext = await decryptFromPeer(msg.from, msg.body)
           const payload = JSON.parse(plaintext)
           messages.update(m => [...m, {
             id: payload.id || Date.now(),
@@ -137,18 +135,26 @@
       const plaintext = JSON.stringify(payload)
       const { type, body } = await encryptForPeer(peerId, plaintext)
 
-      // First message to a new peer uses olm_prekey so the recipient
-      // can create an inbound session without a separate round-trip
-      const envelope = {
-        type: 'olm_prekey',
-        identityKey: (await import('./crypto/olm.js')).loadIdentityKeys()?.ed25519,
-        oneTimeKey: (await import('./crypto/sessionManager.js')).loadOrCreateIdentityKeys()
-          ? await getKeyBundle().then(kb => kb.oneTimeKey)
-          : undefined,
-        body,
-        from: $myPeerId,
-        to: peerId,
-      }
+      // Use olm_prekey only for the first message to a new peer (so recipient
+      // can create inbound session without a separate round-trip).
+      // Subsequent messages use olm_message — cheaper, already has session.
+      const isFirst = !hasSession(peerId) || messageQueue.get(peerId)?.length === 0
+      const kb = isFirst ? await getKeyBundle() : null
+      const envelope = isFirst
+        ? {
+            type: 'olm_prekey',
+            identityKey: kb.identityKey,
+            oneTimeKey: kb.oneTimeKey,
+            body,
+            from: $myPeerId,
+            to: peerId,
+          }
+        : {
+            type: 'olm_message',
+            body,
+            from: $myPeerId,
+            to: peerId,
+          }
       dataChannel.send(JSON.stringify(envelope))
       return true
     } catch (err) {
@@ -242,14 +248,20 @@
     try {
       targetPeerId = peerId
       await createPeerConnection()
+
+      // Fetch keyBundle BEFORE creating the offer — the Olm one-time key
+      // must be reserved in our account before the offer is sent, otherwise
+      // the recipient cannot build a valid inbound session.
+      const kb = await getKeyBundle()
+
       dataChannel = pc.createDataChannel('squawk')
       setupDataChannel(dataChannel)
 
-      // Include our keyBundle in the offer so the recipient can create
-      // an inbound Olm session immediately, without a separate round-trip
-      const kb = await getKeyBundle()
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
+
+      // Attach keyBundle to the signaling offer so the recipient can
+      // immediately create an inbound Olm session without an extra round-trip
       sendSignal({ type: 'offer', sdp: offer, from: $myPeerId, to: peerId, keyBundle: kb })
     } catch (err) {
       console.error('Failed to call peer:', err)

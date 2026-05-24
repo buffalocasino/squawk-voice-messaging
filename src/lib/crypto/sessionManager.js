@@ -22,6 +22,7 @@ const activeSessions = new Map()
  * Side 'inbound' = they initiated (we received a pre-key bundle).
  */
 export async function getOrCreateSession(peerId, side, keyBundle = null) {
+  // Check if already created by a concurrent call before acquiring the session
   if (activeSessions.has(peerId)) {
     return activeSessions.get(peerId).session
   }
@@ -30,6 +31,7 @@ export async function getOrCreateSession(peerId, side, keyBundle = null) {
   const { createOutboundSession, createInboundSession } = await import('./olm.js')
 
   let session
+  const sessionId = `${side}_${peerId}`
   if (side === 'outbound') {
     if (!keyBundle?.identityKey || !keyBundle?.oneTimeKey) {
       throw new Error('Outbound session requires keyBundle with identityKey and oneTimeKey')
@@ -44,7 +46,6 @@ export async function getOrCreateSession(peerId, side, keyBundle = null) {
 
   // Load the pickled session into memory
   const { loadSession } = await import('./olm.js')
-  const sessionId = `${side}_${peerId}`
   session = loadSession(sessionId)
   if (!session) throw new Error(`Failed to load session for ${peerId}`)
 

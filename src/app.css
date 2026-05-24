@@ -40,12 +40,20 @@ body {
   display: none;
 }
 
-/* Pulse animation for recording */
+/* ================================
+// Core Application Theme Colors (for convenience)
+// ================================
+.text-brand-primary:root { color: #8b5cf6; }
+.bg-brand-primary:root { background-color: #8b5cf6; }
+.border-brand-primary:root { border-color: #8b5cf6; }
+
+/* Pulse animation for recording indicator (for glow effect) */
 @keyframes pulse-ring {
   0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.5); opacity: 0; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1.2); opacity: 0; }
 }
 
 .animate-pulse-ring {
-  animation: pulse-ring 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

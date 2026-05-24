@@ -8,7 +8,26 @@ export default defineConfig({
     svelte(),
     tailwindcss(),      VitePWA({
         registerType: 'autoUpdate',
-        manifest: false,
+        manifest: {
+      name: 'Squawk Voice Messaging',
+      short_name: 'Squawk',
+      description: 'Encrypted voice messages. P2P. No server.',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#0f172a',
+      theme_color: '#0f0f23',
+      orientation: 'portrait',
+      icons: [
+        { src: '/icon-192.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+        { src: '/icon-512.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' },
+        { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+      ],
+      categories: ['social', 'communication'],
+      shortcuts: [
+        { name: 'New Squawk', short_name: 'Squawk', description: 'Start a new voice message', url: '/?action=squawk' }
+      ]
+    },
         workbox: {
           globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2,webp,jpg,webm}'],
           navigateFallback: '/offline.html',

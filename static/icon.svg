@@ -1,0 +1,5 @@
+/* SVG icon for Squawk bird theme */
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L2 12h3v10h14V12h3L12 2Z" fill="#FFC0CB" stroke="#8B0000" stroke-width="1.5"/>
+<circle cx="12" cy="7" r="4" fill="#FF69B4"/>
+</svg>

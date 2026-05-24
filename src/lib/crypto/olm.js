@@ -32,12 +32,17 @@ export async function generateIdentityKeys() {
   const account = new olm.Account()
   account.generateOneTimeKeys(1) // also ensures identity keys are generated
 
-  // Extract our Ed25519 identity key (the public part we share with peers)
+  // Extract key material and validate structure
   const ik = JSON.parse(account.identityKeys())
-  const ed25519Key = ik.ed25519
+  const ed25519Key = ik.ed25519 || null
+  const curve25519Key = ik.curve25519 || null
+  if (!ed25519Key || !curve25519Key) {
+    throw new Error("Missing one or more required Olm identity keys (ed25519 or curve25519)");
+  }
 
   const identityKeys = {
     ed25519: ed25519Key,
+    curve25519: curve25519Key,
     pickled: account.pickle({ pickleKey: 'squawk-local-key' }),
     createdAt: Date.now(),
   }
@@ -93,21 +98,36 @@ export async function publishOneTimeKeys(count = 1) {
   return JSON.parse(raw)
 }
 
+// ─── Cached key bundle (regenerated only after each publishOneTimeKeys call) ───
+
+let _cachedBundle = null
+
 /**
  * Get our current one-time key bundle (identity key + next OTK).
- * This is what we send to the signaling server so peers can initiate sessions.
+ * Caches the result so multiple calls within the same registration cycle
+ * return the same OTK (avoiding double-publish that would burn two OTKs).
+ * The cache is invalidated whenever publishOneTimeKeys() is called.
  */
 export async function getKeyBundle() {
+  if (_cachedBundle) return _cachedBundle
   await initOlm()
-  const identity = loadOrCreateIdentityKeys()
+  const identity = await loadOrCreateIdentityKeys()
   const otks = await publishOneTimeKeys(1)
-  // First OTK: the key from the first (and only) identity in the curve25519 object
   const curveKeys = Object.values(otks.curve25519)
   const firstOtKey = curveKeys[0]
-  return {
-    identityKey: identity.ed25519,
+  _cachedBundle = {
+    // identityKey: Curve25519 identity key — used for Olm DH key agreement
+    // (Olm's createOutboundSession/createInboundSession use this for DH)
+    identityKey: identity.curve25519,
+    // oneTimeKey: Curve25519 one-time key — used to establish the session
     oneTimeKey: firstOtKey,
   }
+  return _cachedBundle
+}
+
+/** Invalidate the key bundle cache — call after publishing new OTKs externally. */
+export function invalidateKeyBundleCache() {
+  _cachedBundle = null
 }
 
 // ─── Session management ────────────────────────────────────────────────────────
