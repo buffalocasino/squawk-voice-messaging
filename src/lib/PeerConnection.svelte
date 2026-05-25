@@ -8,7 +8,7 @@
   // Queues payloads while waiting for outbound session to be established
   const messageQueue = new Map() // Map<peerId, payload[]>
 
-  let signalingUrl = $state('wss://tvashtar.tail42e554.ts.net:8080')
+  let signalingUrl = $state('wss://tvashtar.tail42e554.ts.net:8443')
   let ws = null
   let pc = null
   let dataChannel = null

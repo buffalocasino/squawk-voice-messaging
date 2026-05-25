@@ -28,11 +28,13 @@ export function updateMessageStatus(id, status) {
 
 export function updatePeerStatus(peerId, status, keyBundle = null) {
   peerKeyBundles.update(bundles => {
+    if (!bundles) bundles = {}
     const updated = { ...bundles }
     if (keyBundle) updated[peerId] = keyBundle
     return updated
   })
   onlinePeers.update(peers => {
+    if (!peers) peers = new Set()
     const next = new Set(peers)
     if (status === 'online') next.add(peerId)
     else next.delete(peerId)

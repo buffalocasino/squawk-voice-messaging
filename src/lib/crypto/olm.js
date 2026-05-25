@@ -202,8 +202,8 @@ export async function encrypt(sessionId, plaintext) {
   const result = session.encrypt(plaintext)
   saveSession(sessionId, session) // ratchet state advances after encrypt
 
-  // Return just the body — the type prefix is handled by the session for decrypt
-  return result.body
+  // Return the raw body (encrypted symmetric message)
+  return result.body;
 }
 
 /**
