@@ -104,7 +104,7 @@
   }
 </script>
 
-<div class="flex flex-col items-center gap-4">
+<div class="flex flex-col items-center gap-3">
   <!-- Waveform canvas -->
   <div class="w-full h-16 relative">
     <canvas bind:this={canvasEl} width="300" height="64" class="w-full h-full rounded-xl"></canvas>
@@ -112,10 +112,28 @@
       <div class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
         Hold to record
       </div>
-    {:else}
-      <div class="absolute top-1 right-2 text-brand-400 text-xs font-mono font-bold">
-        {formatTime($recordingDuration)}
+    {/if}
+  </div>
+
+  <!-- Prominent duration + progress bar -->
+  <div class="w-full flex flex-col items-center gap-1">
+    {#if $isRecording}
+      <!-- Red dot + duration -->
+      <div class="flex items-center gap-2">
+        <div class="w-2.5 h-2.5 rounded-full bg-red-500 animate-rec"></div>
+        <span class="text-red-400 font-mono font-bold text-lg tabular-nums">
+          {formatTime($recordingDuration)}
+        </span>
       </div>
+      <!-- Progress bar (max 30s) -->
+      <div class="w-48 h-1 bg-gray-800 rounded-full overflow-hidden">
+        <div
+          class="h-full bg-red-500 rounded-full transition-all duration-1000"
+          style="width: {Math.min(100, ($recordingDuration / 30) * 100)}%"
+        ></div>
+      </div>
+    {:else}
+      <div class="h-6"></div>
     {/if}
   </div>
 

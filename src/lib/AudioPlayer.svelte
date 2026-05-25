@@ -45,7 +45,7 @@
   </button>
 
   <!-- Waveform placeholder bars -->
-  <div class="flex-1 flex items-center gap-0.5 h-6">
+  <div class="flex-1 flex items-center gap-0.5 h-6" class:wf-playing={playing}>
     {#each Array(20) as _, i}
       {@const h = Math.abs(Math.sin(i * 0.8 + (duration % 5))) * 100}
       <div

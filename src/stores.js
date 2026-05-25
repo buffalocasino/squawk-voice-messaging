@@ -20,6 +20,12 @@ export const peerKeyBundles = writable({}) // peerId -> { identityKey, oneTimeKe
 /** Online peers registry — updated on peer_online / peer_offline signals */
 export const onlinePeers = writable(new Set())
 
+export function updateMessageStatus(id, status) {
+  messages.update(list =>
+    list.map(m => m.id === id ? { ...m, status } : m)
+  )
+}
+
 export function updatePeerStatus(peerId, status, keyBundle = null) {
   peerKeyBundles.update(bundles => {
     const updated = { ...bundles }

@@ -47,13 +47,61 @@ body {
 .bg-brand-primary:root { background-color: #8b5cf6; }
 .border-brand-primary:root { border-color: #8b5cf6; }
 
-/* Pulse animation for recording indicator (for glow effect) */
+/* Pulse animation for recording indicator */
 @keyframes pulse-ring {
   0% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.05); opacity: 0.8; }
   100% { transform: scale(1.2); opacity: 0; }
 }
-
 .animate-pulse-ring {
   animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Red dot recording pulse */
+@keyframes rec-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-rec { animation: rec-pulse 1s ease-in-out infinite; }
+
+/* View transitions */
+.view-enter { animation: view-in 0.2s ease-out forwards; }
+@keyframes view-in {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Message bubble slide-in */
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-msg { animation: msg-in 0.18s ease-out forwards; }
+
+/* Button press scale */
+.btn-press:active { transform: scale(0.94); transition: transform 0.1s; }
+
+/* Waveform pulse when playing */
+@keyframes wf-pulse {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 1; }
+}
+.wf-playing { animation: wf-pulse 1.2s ease-in-out infinite; }
+
+/* Slide-to-cancel track */
+.slide-cancel-track {
+  background: linear-gradient(90deg, #ef4444 0%, #991b1b 100%);
+  border-radius: 9999px;
+}
+
+/* Message status colors */
+.msg-sent  { color: #a78bfa; }
+.msg-delivered { color: #7c3aed; }
+.msg-failed { color: #ef4444; }
+
+/* Relative timestamp */
+.ts-relative { font-size: 10px; color: #6b7280; }
+
+/* Message group: no top padding for consecutive same-sender messages */
+.msg-group-start { padding-top: 6px; }
+.msg-group-mid   { padding-top: 2px; }

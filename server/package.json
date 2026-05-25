@@ -1,15 +1,13 @@
 {
-  "name": "squawk-signaling-server",
-  "version": "0.0.1",
-  "type": "module",
-  "description": "Squawk P2P WebSocket signaling server — key bundle relay + peer presence",
-  "main": "index.js",
+  "name": "squawk-signaling",
+  "version": "1.0.0",
+  "description": "Squawk WebSocket signaling server",
+  "main": "signaling.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "node signaling.js",
+    "dev": "node --watch signaling.js"
   },
   "dependencies": {
     "ws": "^8.18.0"
-  },
-  "engines": { "node": ">=18" }
+  }
 }

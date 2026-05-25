@@ -5,6 +5,7 @@
   import { swipe } from './lib/touch.js'
   import { installPrompt } from './main.js'
   import { sender } from './lib/crypto/sender.js'
+  import { updateMessageStatus } from './stores.js'
   import AudioPlayer from './lib/AudioPlayer.svelte'
   import Settings from './lib/Settings.svelte'
 
@@ -30,17 +31,14 @@
 
   async function sendText() {
     if (!newMessageText.trim()) return
+    const id = Date.now()
     const payload = {
-      id: Date.now(),
+      id,
       type: 'text',
       text: newMessageText,
       from: 'me',
       time: Date.now(),
-    }
-
-    // Encrypt and send if we have an active sender
-    if (sender) {
-      await sender(payload)
+      status: 'sending',
     }
 
     // Optimistically add locally
@@ -50,6 +48,12 @@
       received: false,
     }])
     newMessageText = ''
+
+    // Encrypt and send if we have an active sender
+    if (sender) {
+      await sender(payload)
+      updateMessageStatus(id, 'sent')
+    }
   }
 
   async function handleRecordedAudio(blob, duration) {
@@ -59,17 +63,15 @@
     const arrayBuffer = await blob.arrayBuffer()
     const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)))
 
+    const id = Date.now()
     const payload = {
-      id: Date.now(),
+      id,
       type: 'audio',
       audioUrl: base64, // inline base64 audio
       duration,
       from: 'me',
       time: Date.now(),
-    }
-
-    if (sender) {
-      await sender(payload)
+      status: 'sending',
     }
 
     messages.update(m => [...m, {
@@ -77,10 +79,23 @@
       to: $selectedContact?.id,
       received: false,
     }])
+
+    if (sender) {
+      await sender(payload)
+      updateMessageStatus(id, 'sent')
+    }
   }
 
   function onSwipeRight() {
     if (currentView === 'chat') goBack()
+  }
+
+  function relTime(ts) {
+    const diff = Date.now() - ts
+    if (diff < 60000) return 'now'
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m`
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h`
+    return new Date(ts).toLocaleDateString()
   }
 </script>
 
@@ -147,7 +162,7 @@
                 <p class="font-medium text-sm">Chat {msg.to}</p>
                 <p class="text-xs text-gray-500 truncate">{msg.type === 'audio' ? '🎙️ Voice message' : msg.text}</p>
               </div>
-              <span class="text-[10px] text-gray-600">{new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span class="text-[10px] text-gray-600">{relTime(msg.time)}</span>
             </button>
           {:else}
             <div class="text-center py-8 text-gray-500">
@@ -162,19 +177,29 @@
         <!-- Messages -->
         <div bind:this={chatScrollEl} class="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-hide">
           {#each $messages.filter(m => m.to === $selectedContact?.id || m.from === $selectedContact?.id) as msg (msg.id)}
-            <div class="flex" class:justify-end={msg.from === 'me'} class:justify-start={msg.from !== 'me'}>
+            {@const isMe = msg.from === 'me'}
+            <div class="flex animate-msg" class:justify-end={isMe} class:justify-start={!isMe}>
               <div
                 class="max-w-[80%] rounded-2xl px-4 py-2.5"
-                class:bg-brand-600={msg.from === 'me'}
-                class:bg-gray-800={msg.from !== 'me'}
+                class:bg-brand-600={isMe}
+                class:bg-gray-800={!isMe}
               >
                 {#if msg.type === 'audio'}
                   <AudioPlayer src={msg.audioUrl} duration={msg.duration || 0} />
                 {:else}
                   <p class="text-sm leading-relaxed">{msg.text}</p>
                 {/if}
-                <span class="text-[10px] opacity-50 mt-1 block">
-                  {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <span class="text-[10px] opacity-50 mt-1 flex items-center justify-end gap-1">
+                  {relTime(msg.time)}
+                  {#if isMe}
+                    {#if msg.status === 'sending'}
+                      <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {:else if msg.status === 'sent' || msg.status === 'delivered' || msg.status === 'read'}
+                      <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    {:else if msg.status === 'failed'}
+                      <svg class="w-3 h-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    {/if}
+                  {/if}
                 </span>
               </div>
             </div>
