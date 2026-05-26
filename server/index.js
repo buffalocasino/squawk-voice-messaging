@@ -1,7 +1,8 @@
 import { WebSocketServer } from 'ws'
 
-const PORT = process.env.PORT || 8080
-const wss = new WebSocketServer({ port: PORT })
+let PORT = process.env.PORT || 8443; // Prioritize 8443 based on Tailscale
+// Ensure binding to all interfaces (0.0.0.0)
+const wss = new WebSocketServer({ port: PORT, host: '0.0.0.0' })
 
 // Peer registry: peerId -> { ws, keyBundle, lastSeen, connectedAt }
 const peers = new Map()

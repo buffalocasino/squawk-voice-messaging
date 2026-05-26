@@ -9,8 +9,9 @@ let wasmReady = false
 export async function initOlm() {
   if (wasmReady) return olm
   const module = await import('@matrix-org/olm')
-  await module.init()
-  olm = module
+  //olm 3.x uses ESM default export
+  await module.default.init()
+  olm = module.default
   wasmReady = true
   return olm
 }
@@ -179,7 +180,7 @@ export async function createInboundSession(theirIdentityKey, theirOneTimeKey, th
   })
 
   // Remove the consumed OTK from our account
-  account.removeOneTimeKeys(session)
+  account.remove_one_time_keys(session)
   identity.pickled = account.pickle({ pickleKey: 'squawk-local-key' })
   saveIdentityKeys(identity)
   account.free()
