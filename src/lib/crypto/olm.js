@@ -136,7 +136,7 @@ const SESSION_PREFIX = 'squawk_session_'
 
 /**
  * Initiate an outbound session with a peer using their identity key + OTK.
- * @param {string} theirIdentityKey  — peer's Ed25519 identity key (base64)
+ * @param {string} theirIdentityKey  — peer's Curve25519 identity key (base64)
  * @param {string} theirOneTimeKey  — one of their OTKs (base64)
  * @param {string} theirPeerId      — peer identifier for session namespacing
  */

@@ -1,18 +1,6 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/pnpm"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "mask": "/(.*)",
-      "to": "index.html"
-    }
-  ],
+  "framework": "sveltekit",
   "buildCommand": "pnpm run build",
-  "outputDirectory": ".svelte-kit/output",
+  "outputDirectory": "dist",
   "devCommand": "pnpm run dev --port $PORT"
 }

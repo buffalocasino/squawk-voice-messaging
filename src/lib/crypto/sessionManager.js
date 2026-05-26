@@ -45,9 +45,11 @@ export async function getOrCreateSession(peerId, side, keyBundle = null) {
   }
 
   // Load the pickled session into memory
+  // sessionId must EXACTLY match what createOutboundSession/createInboundSession saved
   const { loadSession } = await import('./olm.js')
-  session = loadSession(sessionId)
-  if (!session) throw new Error(`Failed to load session for ${peerId}`)
+  const savedSessionId = `${side}_${peerId}`
+  session = loadSession(savedSessionId)
+  if (!session) throw new Error(`Failed to load session for ${peerId} (key: ${savedSessionId})`)
 
   activeSessions.set(peerId, { session, side })
   return session
