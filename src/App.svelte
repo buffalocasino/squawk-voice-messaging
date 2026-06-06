@@ -226,7 +226,7 @@
   <!-- Main content -->
   <main class="main-area">
     {#if currentView === 'contacts'}
-      <!-- Desktop contacts view (when sidebar items are clicked we go to chat) -->
+      <!-- Desktop welcome (when sidebar items are clicked we go to chat) -->
       <div class="desktop-welcome">
         <div class="welcome-logo">🦜</div>
         <h1 class="gold-text welcome-title">Squawk</h1>
@@ -234,6 +234,18 @@
         <div class="welcome-status">
           <span class="status-dot large" class:connected={$connectionStatus === 'connected'}></span>
           {$connectionStatus === 'connected' ? 'Connected' : $connectionStatus === 'signaling' ? 'Connecting...' : 'Offline'}
+        </div>
+        {#if $myPeerId}
+          <div class="welcome-peer-id">
+            <span class="welcome-peer-label">Your Peer ID</span>
+            <code class="welcome-peer-code">{$myPeerId}</code>
+          </div>
+        {/if}
+        <div class="welcome-actions">
+          <button class="welcome-btn" onclick={() => currentView = 'settings'}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+          </button>
         </div>
         <p class="welcome-hint">Select a conversation from the sidebar<br>or connect to a peer to get started.</p>
       </div>
@@ -487,6 +499,25 @@
   .welcome-sub { font-size: 14px; color: var(--text-secondary); text-align: center; line-height: 1.6; }
   .welcome-status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-top: 8px; }
   .welcome-hint { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 20px; line-height: 1.6; }
+  .welcome-peer-id {
+    margin-top: 12px; padding: 12px 20px;
+    background: var(--bg-elevated); border-radius: 12px;
+    border: 1px solid var(--border); text-align: center;
+  }
+  .welcome-peer-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; }
+  .welcome-peer-code {
+    font-family: var(--font-mono); font-size: 14px; color: var(--gold-light);
+    display: block; margin-top: 4px; word-break: break-all;
+  }
+  .welcome-actions { margin-top: 12px; }
+  .welcome-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--bg-elevated);
+    color: var(--text-secondary); font-size: 13px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .welcome-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
 
   /* ── Chat header ──────────────────────────────────────────────── */
   .chat-header {
