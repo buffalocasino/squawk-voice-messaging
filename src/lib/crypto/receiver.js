@@ -7,7 +7,7 @@
  *   await handleEncryptedMessage(msg.from, msg.body)
  */
 import { decryptFromPeer, hasSession } from './sessionManager.js'
-import { messages } from '../../stores.js'
+import { persistentMessages } from '../storage/persistentStores.svelte.js'
 
 /**
  * Handle an encrypted message from a peer.
@@ -21,19 +21,16 @@ export async function handleEncryptedMessage(from, body) {
   try {
     const plaintext = await decryptFromPeer(from, body)
     const payload = JSON.parse(plaintext)
-    messages.update(m => [
-      ...m,
-      {
-        id: payload.id || Date.now(),
-        type: payload.type || 'audio',
-        text: payload.text,
-        audioUrl: payload.audioUrl,
-        duration: payload.duration,
-        from,
-        time: Date.now(),
-        received: true,
-      },
-    ])
+    persistentMessages.add({
+      id: payload.id || Date.now(),
+      type: payload.type || 'audio',
+      text: payload.text,
+      audioUrl: payload.audioUrl,
+      duration: payload.duration,
+      from,
+      time: Date.now(),
+      received: true,
+    })
     return payload
   } catch (err) {
     console.error('[receiver] Decrypt failed:', err)

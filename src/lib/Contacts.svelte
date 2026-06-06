@@ -1,10 +1,5 @@
 <script>
-  /**
-   * T5-3 — Contact Management
-   * Stores contacts in localStorage key 'squawk_contacts'
-   * Contacts: { id, name, peerId, publicKey, lastSeen }
-   */
-  import { onMount } from 'svelte'
+  import { messages } from '../stores.js'
 
   const STORAGE_KEY = 'squawk_contacts'
 
@@ -14,6 +9,8 @@
   let newKey = $state('')
   let showAdd = $state(false)
   let added = $state(false)
+
+  import { onMount } from 'svelte'
 
   onMount(() => {
     loadContacts()
@@ -26,7 +23,6 @@
     } catch {
       contacts = []
     }
-    // Sort by lastSeen desc
     contacts.sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0))
   }
 
@@ -57,49 +53,53 @@
     saveContacts(contacts.filter(c => c.id !== id))
   }
 
-  function formatTime(ts) {
-    if (!ts) return 'Never'
-    const d = new Date(ts)
-    const now = new Date()
-    const diff = now - d
-    if (diff < 60000) return 'Just now'
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`
-    return d.toLocaleDateString()
+  function lastMessageFor(contactId) {
+    const msgs = $messages.filter(m => m.to === contactId || m.from === contactId)
+    if (!msgs.length) return null
+    return msgs[msgs.length - 1]
+  }
+
+  function relTime(ts) {
+    if (!ts) return ''
+    const diff = Date.now() - ts
+    if (diff < 60000) return 'now'
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m`
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h`
+    return new Date(ts).toLocaleDateString()
   }
 </script>
 
-<div class="space-y-3">
+<div class="space-y-2 px-4 py-3">
   <div class="flex items-center justify-between">
-    <h3 class="font-semibold text-sm text-gray-300">Contacts</h3>
+    <h3 class="font-medium text-xs text-gray-500 uppercase tracking-wider">Contacts</h3>
     <button
       onclick={() => { showAdd = !showAdd }}
-      class="text-xs text-brand-400 hover:text-brand-300 transition-colors font-medium"
+      class="text-xs text-phantom-400 hover:text-phantom-300 transition-colors font-medium"
     >
       {showAdd ? 'Cancel' : '+ Add'}
     </button>
   </div>
 
   {#if showAdd}
-    <div class="bg-gray-900 rounded-xl p-3 space-y-2">
+    <div class="bg-card rounded-xl p-3 space-y-2 border border-border-subtle">
       <input
         bind:value={newName}
         placeholder="Display name"
-        class="w-full bg-gray-800 text-white text-sm px-3 py-2 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+        class="w-full bg-surface text-white/90 text-sm px-3 py-2 rounded-lg placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-phantom-500/40 font-normal"
       />
       <input
         bind:value={newPeerId}
         placeholder="Peer ID"
-        class="w-full bg-gray-800 text-white text-sm px-3 py-2 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+        class="w-full bg-surface text-white/90 text-sm px-3 py-2 rounded-lg placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-phantom-500/40 font-normal"
       />
       <input
         bind:value={newKey}
         placeholder="Public key (optional)"
-        class="w-full bg-gray-800 text-white text-sm px-3 py-2 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+        class="w-full bg-surface text-white/90 text-sm px-3 py-2 rounded-lg placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-phantom-500/40 font-normal"
       />
       <button
         onclick={addContact}
-        class="w-full py-2 bg-brand-600 hover:bg-brand-500 rounded-lg text-sm font-semibold transition-colors"
+        class="w-full py-2 bg-phantom-500 hover:bg-phantom-400 rounded-lg text-sm font-medium transition-colors text-white"
       >
         {added ? '✓ Added' : 'Add Contact'}
       </button>
@@ -107,25 +107,38 @@
   {/if}
 
   {#if contacts.length === 0}
-    <p class="text-xs text-gray-500 py-3 text-center">No contacts yet. Add someone to start chatting.</p>
+    <p class="text-xs text-gray-600 py-6 text-center">No saved contacts. Add someone to start chatting.</p>
   {:else}
-    <div class="space-y-1">
+    <div class="divide-y divide-border-subtle">
       {#each contacts as contact (contact.id)}
-        <div class="flex items-center gap-2 bg-gray-900 rounded-xl px-3 py-2.5">
-          <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold flex-shrink-0">
+        {@const lastMsg = lastMessageFor(contact.id)}
+        <div class="flex items-center gap-3 py-3">
+          <div class="w-10 h-10 rounded-full bg-phantom-500/15 flex items-center justify-center text-base font-medium text-phantom-300 flex-shrink-0">
             {contact.name[0]?.toUpperCase() || '?'}
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-white truncate">{contact.name}</p>
-            <p class="text-[10px] text-gray-500 truncate">{contact.peerId}</p>
+            <div class="flex items-center justify-between">
+              <p class="font-medium text-sm text-white/90 truncate">{contact.name}</p>
+              {#if lastMsg}
+                <span class="text-[10px] text-gray-600 flex-shrink-0 ml-2">{relTime(lastMsg.time)}</span>
+              {:else}
+                <span class="text-[10px] text-gray-600 flex-shrink-0 ml-2">{relTime(contact.lastSeen)}</span>
+              {/if}
+            </div>
+            <p class="text-xs text-gray-600 truncate mt-0.5">
+              {#if lastMsg}
+                {lastMsg.type === 'audio' ? '🎙️ Voice message' : lastMsg.text}
+              {:else}
+                Peer {contact.peerId?.slice(0, 12)}...
+              {/if}
+            </p>
           </div>
-          <span class="text-[10px] text-gray-600 flex-shrink-0">{formatTime(contact.lastSeen)}</span>
           <button
             onclick={() => removeContact(contact.id)}
-            class="p-1 text-gray-600 hover:text-red-400 transition-colors flex-shrink-0"
+            class="p-1.5 text-gray-700 hover:text-red-400 transition-colors flex-shrink-0 rounded-full hover:bg-card-hover"
             aria-label="Remove contact"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
       {/each}

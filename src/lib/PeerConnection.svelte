@@ -1,14 +1,21 @@
 <script>
-  import { connectionStatus, myPeerId, contacts, messages } from '../stores.js'
+  import { connectionStatus, myPeerId, contacts } from '../stores.js'
+  import { persistentMessages, persistentContacts, initPersistence } from './storage/persistentStores.svelte.js'
+  import { openVault } from './storage/SecureVault.js'
   import { initOlm, loadOrCreateIdentityKeys, getKeyBundle } from './crypto/olm.js'
   import { getOrCreateSession, encryptForPeer, decryptFromPeer, hasSession } from './crypto/sessionManager.js'
   import { registerSender } from './crypto/sender.js'
+  import { initSealed } from './crypto/sealed.js'
+  import { onMount } from 'svelte'
 
   // Message queue for handling session-init race conditions
   // Queues payloads while waiting for outbound session to be established
   const messageQueue = new Map() // Map<peerId, payload[]>
 
-  let signalingUrl = $state('wss://tvashtar.tail42e554.ts.net:8443')
+  // Signaling URL: dev = localhost, prod = VPS via Tailscale
+  let signalingUrl = $state(
+    import.meta.env.VITE_SIGNALING_URL || 'ws://localhost:8083'
+  )
   let ws = null
   let pc = null
   let dataChannel = null
@@ -18,7 +25,13 @@
   async function ensureOlm() {
     if (OlmInitialized) return
     await initOlm()
-    await loadOrCreateIdentityKeys()
+    const keys = await loadOrCreateIdentityKeys()
+    // Initialize Sealed at Rest key from identity key material
+    const keyMaterial = keys.ed25519 + keys.curve25519
+    await initSealed(keyMaterial).catch(err => console.warn('[sealed] init failed:', err))
+    // Open encrypted IndexedDB vault for message persistence
+    await openVault(keyMaterial)
+    await initPersistence()
     OlmInitialized = true
   }
 
@@ -76,7 +89,7 @@
           })
           const plaintext = await decryptFromPeer(msg.from, msg.body)
           const payload = JSON.parse(plaintext)
-          messages.update(m => [...m, {
+          persistentMessages.add({
             id: payload.id || Date.now(),
             type: payload.type || 'audio',
             text: payload.text,
@@ -85,13 +98,13 @@
             to: $myPeerId,
             time: Date.now(),
             received: true
-          }])
+          })
         } else if (msg.type === 'olm_message') {
           // Subsequent encrypted message
           if (!hasSession(msg.from)) return
           const plaintext = await decryptFromPeer(msg.from, msg.body)
           const payload = JSON.parse(plaintext)
-          messages.update(m => [...m, {
+          persistentMessages.add({
             id: payload.id || Date.now(),
             type: payload.type || 'audio',
             text: payload.text,
@@ -100,7 +113,7 @@
             to: $myPeerId,
             time: Date.now(),
             received: true
-          }])
+          })
         }
       } catch (err) {
         console.error('Failed to decrypt message:', err)
@@ -294,11 +307,20 @@
   }
 
   // Expose sendEncryptedMessage for use by App.svelte
+  // Expose callPeer so parent can initiate calls
+  let { onCallReady } = $props()
+
   export { sendEncryptedMessage, connectToSignaling, callPeer }
 
-  // Register the sender when PeerConnection mounts
+  // Register the sender + expose callPeer when PeerConnection mounts
   $effect(() => {
     registerSender(sendEncryptedMessage)
+    if (onCallReady) onCallReady(callPeer)
     return () => { registerSender(null) }
+  })
+
+  // Auto-connect to signaling server on mount
+  onMount(() => {
+    connectToSignaling()
   })
 </script>

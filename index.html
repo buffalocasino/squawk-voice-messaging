@@ -2,16 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f0f23" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+
+  <!-- PWA: Theme & standalone -->
+  <meta name="theme-color" content="#0d0d1a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="description" content="Encrypted voice messages. P2P. No server." />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Description -->
+  <meta name="description" content="Zero-knowledge, ephemeral voice messaging. End-to-end encrypted. P2P. No server stores your messages." />
+
+  <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icon-192.png" />
+
+  <!-- Icons (Apple + generic) -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+
+  <!-- iOS Splash Screen — mimics native app launch (lightweight dark background) -->
+  <!-- iPhone 14/15/16 Pro (390×844) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" href="/splash/apple-splash-1170-2532.png" />
+  <!-- iPhone 14/15 Pro Max (430×932) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="/splash/apple-splash-1290-2796.png" />
+  <!-- iPhone 14/15/16 (390×844) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 2)" href="/splash/apple-splash-780-1688.png" />
+  <!-- iPhone SE / 8 (375×667) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="/splash/apple-splash-750-1334.png" />
+  <!-- iPhone 13 mini / 12 mini (375×812) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="/splash/apple-splash-1125-2436.png" />
+  <!-- iPhone 11 / XR (414×896) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" href="/splash/apple-splash-828-1792.png" />
+  <!-- iPhone 11 Pro Max / XS Max (414×896) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" href="/splash/apple-splash-1242-2688.png" />
+  <!-- iPad Pro 12.9" (1024×1366) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="/splash/apple-splash-2048-2732.png" />
+  <!-- iPad 10.2" (810×1080) -->
+  <link rel="apple-touch-startup-image" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2)" href="/splash/apple-splash-1620-2160.png" />
+
+  <!-- Security: disable phone number detection on iOS -->
+  <meta name="format-detection" content="telephone=no" />
+
   <title>Squawk</title>
 </head>
-<body class="bg-gray-950 text-white antialiased">
+<body>
   <div id="app"></div>
   <script type="module" src="/src/main.js"></script>
 </body>

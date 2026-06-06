@@ -1,6 +1,7 @@
 {
   "name": "squawk-signaling",
   "version": "1.0.0",
+  "type": "module",
   "description": "Squawk WebSocket signaling server",
   "main": "signaling.js",
   "scripts": {
@@ -8,6 +9,6 @@
     "dev": "node --watch signaling.js"
   },
   "dependencies": {
-    "ws": "^8.18.0"
+    "ws": "^8.21.0"
   }
 }

@@ -2,3 +2,5 @@ node_modules/
 .svelte-kit/
 dist/
 .vercel
+
+.vercel

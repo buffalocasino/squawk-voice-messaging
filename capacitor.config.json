@@ -1,0 +1,48 @@
+{
+  "appId": "com.tvashtar.squawk",
+  "appName": "Squawk",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0,
+      "backgroundColor": "#0d0d1a",
+      "showSpinner": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_squawk",
+      "iconColor": "#7c6fd6"
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    },
+    "Keyboard": {
+      "resize": "body",
+      "style": "dark"
+    },
+    "StatusBar": {
+      "style": "dark",
+      "backgroundColor": "#0d0d1a",
+      "overlaysWebView": false
+    },
+    "App": {
+      "backgroundColor": "#0d0d1a"
+    }
+  },
+  "ios": {
+    "contentInset": "always",
+    "allowsLinkPreview": false,
+    "scrollEnabled": false,
+    "preferredContentMode": "mobile",
+    "limitsNavigationsToAppBoundDomains": true
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false,
+    "backgroundColor": "#0d0d1a"
+  }
+}
