@@ -8,10 +8,26 @@ let wasmReady = false
 
 export async function initOlm() {
   if (wasmReady) return olm
-  const module = await import('@matrix-org/olm')
-  //olm 3.x uses ESM default export
-  await module.default.init()
-  olm = module.default
+
+  // Try the CJS global first (some builds expose window.Olm)
+  if (typeof window !== 'undefined' && window.Olm) {
+    olm = window.Olm
+    await olm.init()
+    wasmReady = true
+    return olm
+  }
+
+  // Dynamic import — Vite wraps CJS modules, try multiple access patterns
+  const mod = await import('@matrix-org/olm')
+  const Olm = mod.default || mod.Olm || mod
+
+  if (!Olm || typeof Olm.init !== 'function') {
+    console.error('[olm] Import result:', Object.keys(mod))
+    throw new Error('Olm failed to load — no init() found on import')
+  }
+
+  await Olm.init()
+  olm = Olm
   wasmReady = true
   return olm
 }
