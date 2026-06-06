@@ -239,6 +239,10 @@
           <div class="welcome-peer-id">
             <span class="welcome-peer-label">Your Peer ID</span>
             <code class="welcome-peer-code">{$myPeerId}</code>
+            <button class="copy-id-btn" onclick={() => { navigator.clipboard.writeText($myPeerId) }} title="Copy Peer ID">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy
+            </button>
           </div>
         {/if}
         <div class="welcome-actions">
@@ -509,6 +513,15 @@
     font-family: var(--font-mono); font-size: 14px; color: var(--gold-light);
     display: block; margin-top: 4px; word-break: break-all;
   }
+  .copy-id-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px; padding: 6px 14px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg-elevated);
+    color: var(--text-secondary); font-size: 12px; cursor: pointer;
+    transition: all 0.15s; font-family: var(--font-main);
+  }
+  .copy-id-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .copy-id-btn:active { transform: scale(0.96); }
   .welcome-actions { margin-top: 12px; }
   .welcome-btn {
     display: inline-flex; align-items: center; gap: 8px;
