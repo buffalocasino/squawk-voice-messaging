@@ -1,6 +1,7 @@
 <script>
   import { myPeerId, connectionStatus, messages } from '../stores.js'
-  import { loadIdentityKeys, isOlmReady, listSessions } from './crypto/olm.js'
+  import { loadIdentityKeys, isOlmReady } from './crypto/olm.js'
+  import { listSessions } from './crypto/sessionManager.js'
   import { isSealed, destroyKey } from './crypto/sealed.js'
   import { initPanicShake, panic, shutdown } from './crypto/panic.js'
   import { secureWipeLocalStorage } from './crypto/wipe.js'
