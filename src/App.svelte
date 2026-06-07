@@ -149,19 +149,37 @@
   function copyPeerId() {
     const id = get(myPeerId)
     if (!id) return
-    try {
-      navigator.clipboard.writeText(id)
-    } catch {
-      const el = document.createElement('textarea')
-      el.value = id
-      el.style.position = 'fixed'; el.style.opacity = '0'
-      document.body.appendChild(el)
-      el.select()
-      document.execCommand('copy')
-      document.body.removeChild(el)
+
+    // Try clipboard API first, fall back to execCommand
+    let copied = false
+
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(id).then(() => {
+        copied = true
+        copyFeedback = true
+        setTimeout(() => copyFeedback = false, 1500)
+      }).catch(() => {
+        fallbackCopy(id)
+      })
+    } else {
+      fallbackCopy(id)
     }
-    copyFeedback = true
-    setTimeout(() => copyFeedback = false, 1500)
+
+    function fallbackCopy(text) {
+      if (copied) return
+      const el = document.createElement('textarea')
+      el.value = text
+      el.style.position = 'fixed'
+      el.style.left = '-9999px'
+      el.style.top = '0'
+      document.body.appendChild(el)
+      el.focus()
+      el.select()
+      try { document.execCommand('copy') } catch {}
+      document.body.removeChild(el)
+      copyFeedback = true
+      setTimeout(() => copyFeedback = false, 1500)
+    }
   }
 
   function relTime(ts) { const d = Date.now() - ts; if (d < 60000) return 'now'; if (d < 3600000) return `${Math.floor(d/60000)}m`; if (d < 86400000) return `${Math.floor(d/3600000)}h`; return new Date(ts).toLocaleDateString() }
