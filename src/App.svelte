@@ -17,6 +17,9 @@
   import VideoRecorder from './lib/components/VideoRecorder.svelte'
   import VideoPlayer from './lib/components/VideoPlayer.svelte'
   import { playSend, playReceive } from './lib/audio/SoundEngine.js'
+  import { pageSlide, bubblePop, ripple, springScale } from './lib/motion/SquawkMotion.js'
+  import { fade, fly, scale } from 'svelte/transition'
+  import { cubicOut } from 'svelte/easing'
 
   let currentView = $state('contacts')
   let newMessageText = $state('')
@@ -285,6 +288,7 @@
   <!-- Main content -->
   <main class="main-area">
     {#if currentView === 'contacts'}
+      <div in:pageSlide={{ direction: 'left' }} out:pageSlide>
       <!-- Desktop welcome (when sidebar items are clicked we go to chat) -->
       <div class="desktop-welcome">
         <div class="welcome-logo">🦜</div>
@@ -315,7 +319,9 @@
         </div>
         <p class="welcome-hint">Select a conversation from the sidebar<br>or connect to a peer to get started.</p>
       </div>
+      </div>
     {:else if currentView === 'chat'}
+      <div in:pageSlide={{ direction: 'right' }} out:pageSlide>
       <!-- Chat header -->
       <div class="chat-header glass">
         <button class="icon-btn back-btn" onclick={goBack} aria-label="Back">
@@ -401,9 +407,10 @@
             class="msg-input"
           />
         </div>
-        <button class="send-btn" onclick={sendText} disabled={!newMessageText.trim()} aria-label="Send">
+        <button class="send-btn" onclick={sendText} disabled={!newMessageText.trim()} aria-label="Send" use:ripple>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
+      </div>
       </div>
     {:else if currentView === 'settings' || mobileTab === 'settings'}
       <div class="chat-header glass">
