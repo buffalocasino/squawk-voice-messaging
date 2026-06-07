@@ -249,7 +249,7 @@
         <div class="sidebar-section-label">Call a Peer</div>
         <div class="call-peer-row">
           <input class="call-peer-input" bind:value={peerCallInput} placeholder="Peer ID..." />
-          <button class="call-peer-btn" onclick={() => { if (callPeerFn && peerCallInput.trim()) { callPeerFn(peerCallInput.trim()); selectContact({ id: peerCallInput.trim(), name: peerCallInput.trim() }) } }} disabled={!peerCallInput.trim() || !callPeerFn}>Call</button>
+          <button class="call-peer-btn" onclick={() => { console.log('Call button clicked, callPeerFn:', !!callPeerFn, 'input:', peerCallInput.trim()); if (callPeerFn && peerCallInput.trim()) { callPeerFn(peerCallInput.trim()); selectContact({ id: peerCallInput.trim(), name: peerCallInput.trim() }) } }} disabled={!peerCallInput.trim() || !callPeerFn}>Call</button>
         </div>
       </div>
       <span class="sidebar-footer-text">Squawk v0.1 — E2E Encrypted</span>

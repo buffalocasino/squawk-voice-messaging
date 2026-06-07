@@ -1,0 +1,126 @@
+{
+  "generated": "2026-06-07T17:41:05.701Z",
+  "model": "gemma4:e2b",
+  "scenario": "full",
+  "totalTests": 10,
+  "tests": [
+    {
+      "name": "Send Encrypted Text Message",
+      "steps": [
+        "Open Squawk application",
+        "Select a peer and initiate a new chat",
+        "Type a test message (e.g., 'Test encrypted')",
+        "Send the message"
+      ],
+      "expectedResult": "Message is sent successfully and appears in the chat [4D [K chat history on the recipient's end.",
+      "failure": "Message fails to send, or encryption marker is missing.",
+      "severity": "Critical"
+    },
+    {
+      "name": "Verify P2P Connection Establishment",
+      "steps": [
+        "Initiate a direct P2P connection with Peer B",
+        "Monitor the connection status indicator",
+        "Wait for connection handshake completion"
+      ],
+      "expectedResult": "Connection status changes from 'Connecting' to 'Conn [5D [K 'Connected'.",
+      "failure": "Connection hangs or fails to establish, resulting in a 'Con [4D [K 'Connection Error'.",
+      "severity": "High"
+    },
+    {
+      "name": "Voice Recording and Playback Functionality",
+      "steps": [
+        "Start a voice recording session with Peer C",
+        "Record 10 seconds of audio",
+        "Stop the recording",
+        "Play the recorded audio back to verify integrity"
+      ],
+      "expectedResult": "Audio is successfully recorded and plays back withou [6D [K without corruption.",
+      "failure": "Recording fails, or playback results in distorted/corrupted [19D [K distorted/corrupted audio.",
+      "severity": "Medium"
+    },
+    {
+      "name": "Test View-Once Message Expiry",
+      "steps": [
+        "Receive a message explicitly marked as 'View-Once' from Peer D",
+        "Attempt to view the message immediately",
+        "Wait for the defined expiry duration (e.g., 1 hour)",
+        "Attempt to view the message again"
+      ],
+      "expectedResult": "The message is visible only once, and after the expi [4D [K expiry time, it is removed or marked as unavailable.",
+      "failure": "Message remains visible indefinitely after expiry, violatin [8D [K violating the 'view-once' rule.",
+      "severity": "High"
+    },
+    {
+      "name": "End Chat Session",
+      "steps": [
+        "Enter an active chat session with Peer E",
+        "Locate and select the 'End Chat' option",
+        "Confirm session termination"
+      ],
+      "expectedResult": "The chat session is closed, and the connection to Pe [2D [K Peer E is terminated.",
+      "failure": "Chat session remains open or application crashes during ter [3D [K termination.",
+      "severity": "Medium"
+    },
+    {
+      "name": "Verify 24h Auto-Expiry Mechanism",
+      "steps": [
+        "Send a message with an auto-expiry setting of 24 hours to Peer F",
+        "Monitor the message status for 23 hours and 59 minutes",
+        "Attempt to access the message after 24 hours"
+      ],
+      "expectedResult": "The message is automatically removed or locked after [5D [K after exactly 24 hours.",
+      "failure": "The message remains accessible indefinitely, or the expiry [K timer resets incorrectly.",
+      "severity": "Critical"
+    },
+    {
+      "name": "Copy Peer ID Functionality",
+      "steps": [
+        "Access the peer list",
+        "Select a target peer and initiate 'Copy Peer ID'",
+        "Verify the copied identifier is correct",
+        "Attempt to paste the ID into a new chat setup"
+      ],
+      "expectedResult": "The unique peer ID is successfully copied and usable [6D [K usable for new connections.",
+      "failure": "Copied ID is incorrect, or pasting the ID fails to initiate [8D [K initiate communication.",
+      "severity": "High"
+    },
+    {
+      "name": "Navigate Bottom Navigation Bar",
+      "steps": [
+        "Launch the main chat screen",
+        "Interact with each item in the bottom navigation bar (e.g., Chats, C [1D [K Contacts, Settings)",
+        "Verify that navigating between screens is smooth and correct"
+      ],
+      "expectedResult": "All navigation items are functional, and switching b [1D [K between sections loads the correct view.",
+      "failure": "Navigation fails, or switching between tabs causes a crash. [6D [K crash.",
+      "severity": "Medium"
+    },
+    {
+      "name": "End-to-End Message Flow Integrity",
+      "steps": [
+        "Send an encrypted message (Scenario 1)",
+        "Verify receipt by the recipient",
+        "Verify that no intermediate decryption step exposes metadata",
+        "Check timestamps for consistency"
+      ],
+      "expectedResult": "The entire flow is secure, messages are delivered co [2D [K correctly, and metadata protection is maintained.",
+      "failure": "Message delivery error, or metadata leakage detected in log [3D [K logs/system files.",
+      "severity": "Critical"
+    },
+    {
+      "name": "Test Session Expiry Error Handling",
+      "steps": [
+        "Attempt to access an expired message (Scenario 6)",
+        "Monitor the application for error messages or graceful handling",
+        "Verify that no sensitive information is revealed upon failure"
+      ],
+      "expectedResult": "The app displays a standard, non-sensitive expiratio [9D [K expiration notification instead of a system crash or data leak.",
+      "failure": "Accessing the expired content causes an unhandled exception [9D [K exception or reveals session details.",
+      "severity": "High"
+    }
+  ],
+  "passed": 0,
+  "failed": 0,
+  "skipped": 10
+}

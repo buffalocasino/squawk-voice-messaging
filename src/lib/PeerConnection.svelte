@@ -157,14 +157,17 @@
   }
 
   async function callPeer(peerId) {
+    console.log('[callPeer] Calling:', peerId)
     try {
       targetPeerId = peerId
       await createPeerConnection()
       const kb = await getKeyBundle()
+      console.log('[callPeer] Key bundle ready, creating data channel')
       dataChannel = pc.createDataChannel('squawk')
       setupDataChannel(dataChannel)
       const offer = await pc.createOffer()
       await pc.setLocalDescription(offer)
+      console.log('[callPeer] Sending offer to signaling')
       sendSignal({ type: 'offer', sdp: offer, from: $myPeerId, to: peerId, keyBundle: kb })
     } catch (err) {
       console.error('Call failed:', err)

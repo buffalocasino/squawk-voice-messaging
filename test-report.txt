@@ -1,0 +1,59 @@
+[
+  {
+    "test_id": "KEY_EXCH_01",
+    "description": "Man-in-the-Middle (MITM) Attack during Initial Key Exch[4D[K
+Exchange",
+    "focus": "E2EE Key Exchange",
+    "methodology": "Attempt to intercept and substitute public keys during [K
+the handshake phase to ensure the session keys are established between unin[4D[K
+unintended parties. Verify that certificate pinning or equivalent mechanism[9D[K
+mechanisms prevent this.",
+    "expected_result": "Session establishment fails, or a detectable mismat[6D[K
+mismatch is logged."
+  },
+  {
+    "test_id": "AESGCM_02",
+    "description": "Nonce/IV Reuse and Stream Malleability Test",
+    "focus": "AES-GCM Encryption/Decryption",
+    "methodology": "Inject modified ciphertext packets to check if the rece[4D[K
+receiver correctly detects tampering or if nonce reuse leads to decryption [K
+vulnerability. Specifically test for valid AES-GCM tag validation.",
+    "expected_result": "Any attempt to decrypt tampered data results in a M[1D[K
+MAC failure (authentication tag mismatch), immediately terminating decrypti[8D[K
+decryption."
+  },
+  {
+    "test_id": "SESSION_MGT_03",
+    "description": "Session State Persistence and Revocation Test",
+    "focus": "Session Management",
+    "methodology": "Simulate a user logout or session termination. Verify t[1D[K
+that all active cryptographic material (session keys, ephemeral keys) are i[1D[K
+immediately revoked on the server side and that no residual state allows fo[2D[K
+for future connection.",
+    "expected_result": "All associated session tokens and derived symmetric[9D[K
+symmetric keys are invalidated upon explicit revocation."
+  },
+  {
+    "test_id": "PFS_04",
+    "description": "Perfect Forward Secrecy (PFS) Re-keying Validation",
+    "focus": "E2EE Key Exchange",
+    "methodology": "Force a session re-keying event. Verify that the new sy[2D[K
+symmetric session keys are derived from fresh, ephemeral key exchanges and [K
+that compromise of a long-term private key does not compromise past session[7D[K
+session communications.",
+    "expected_result": "New session keys are cryptographically independent [K
+of previous sessions; historical traffic remains secure."
+  },
+  {
+    "test_id": "INTEGRITY_05",
+    "description": "End-to-End Data Integrity Verification Under Adversaria[10D[K
+Adversarial Conditions",
+    "focus": "AES-GCM Encryption/Decryption",
+    "methodology": "Encrypt sensitive messages and introduce bit-flips or a[1D[K
+arbitrary modifications in transit. Verify that the recipient's decryption [K
+process detects the integrity failure imposed by AES-GCM's Authentication T[1D[K
+Tag (MAC).",
+    "expected_result": "Message decryption fails due to invalid authenticat[11D[K
+authentication tag, preventing the processing of corrupted data."
+  }
+]
