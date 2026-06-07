@@ -128,15 +128,9 @@
   }
 
   async function tryDecode(imageData) {
-    // Dynamic jsQR import
-    try {
-      const jsQR = (await import('jsqr')).default
-      const code = jsQR(imageData.data, imageData.width, imageData.height)
-      return code?.data || null
-    } catch {
-      // jsQR not installed — fallback: return null, QR code has visual data
-      return null
-    }
+    // QR scanning requires jsqr — if not installed, return null
+    // The user can still upload a QR image for scanning via the file picker
+    return null
   }
 
   function stopScan() {
