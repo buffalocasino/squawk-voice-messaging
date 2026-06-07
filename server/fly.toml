@@ -1,0 +1,20 @@
+app = "squawk-signaling"
+primary_region = "iad"
+
+[build]
+  builder = "node"
+  build_command = "npm install"
+
+[env]
+  PORT = "8080"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls"]
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]

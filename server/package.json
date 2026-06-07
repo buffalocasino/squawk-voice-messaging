@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Squawk WebSocket signaling server",
-  "main": "signaling.js",
+  "main": "start.mjs",
   "scripts": {
-    "start": "node signaling.js",
-    "dev": "node --watch signaling.js"
+    "start": "node start.mjs"
   },
   "dependencies": {
     "ws": "^8.21.0"

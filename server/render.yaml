@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: squawk-signaling
+    env: node
+    buildCommand: npm install
+    startCommand: PORT=10000 node start.mjs
+    plan: free
