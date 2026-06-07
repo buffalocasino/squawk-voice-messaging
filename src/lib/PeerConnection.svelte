@@ -35,8 +35,13 @@
     OlmInitialized = true
   }
 
-  function generatePeerId() {
-    const id = 'squawk-' + Math.random().toString(36).substring(2, 10)
+  async function generatePeerId() {
+    // Hash identity keys for a deterministic, cryptographic peer ID
+    const keys = await loadOrCreateIdentityKeys()
+    const material = keys.ed25519 + keys.curve25519
+    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(material))
+    const hex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('')
+    const id = hex.slice(0, 16) // 16-char hex fingerprint
     myPeerId.set(id)
     return id
   }
@@ -204,7 +209,7 @@
     try {
       if (ws) { ws.close(); ws = null }
       await ensureOlm()
-      const id = generatePeerId()
+      const id = await generatePeerId()
       ws = new WebSocket(signalingUrl)
 
       ws.onopen = async () => {
