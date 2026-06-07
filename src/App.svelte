@@ -21,7 +21,6 @@
   import QRCodePair from './lib/components/QRCodePair.svelte'
   import { pageSlide, bubblePop, ripple, springScale } from './lib/motion/SquawkMotion.js'
   import { fade, fly, scale } from 'svelte/transition'
-  import { cubicOut } from 'svelte/easing'
 
   let currentView = $state('contacts')
   let newMessageText = $state('')
