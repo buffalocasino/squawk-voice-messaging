@@ -14,6 +14,7 @@
   import ViewOnceOverlay from './lib/components/ViewOnceOverlay.svelte'
   import BottomNav from './lib/components/BottomNav.svelte'
   import EphemeralSettings from './lib/components/EphemeralSettings.svelte'
+  import { playSend, playReceive } from './lib/audio/SoundEngine.js'
 
   let currentView = $state('contacts')
   let newMessageText = $state('')
@@ -108,6 +109,7 @@
     stampWithConfig(msg) // 24h expiry via config
     persistentMessages.add(msg)
     newMessageText = ''
+    playSend()
     if (sender) {
       try { await sender(msg) } catch {}
     }

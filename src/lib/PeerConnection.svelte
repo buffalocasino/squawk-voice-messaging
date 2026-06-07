@@ -6,6 +6,7 @@
   import { registerSender } from './crypto/sender.js'
   import { initSealed } from './crypto/sealed.js'
   import { onMount } from 'svelte'
+  import { playConnect, playDisconnect, playReceive } from './audio/SoundEngine.js'
 
   let signalingUrl = $state(import.meta.env.VITE_SIGNALING_URL || 'ws://localhost:8083')
   let ws = null
@@ -53,7 +54,10 @@
 
   function setupDataChannel(channel) {
     dataChannel = channel
-    channel.onopen = () => connectionStatus.set('connected')
+    channel.onopen = () => {
+      connectionStatus.set('connected')
+      playConnect()
+    }
     channel.onmessage = async e => {
       try {
         const msg = JSON.parse(e.data)
@@ -83,6 +87,7 @@
       time: Date.now(),
       received: true,
     })
+    playReceive()
   }
 
   async function sendEncryptedMessage(msg) {
@@ -129,7 +134,10 @@
       }
 
       ws.onerror = () => connectionStatus.set('failed')
-      ws.onclose = () => connectionStatus.set('disconnected')
+      ws.onclose = () => {
+        connectionStatus.set('disconnected')
+        playDisconnect()
+      }
 
       ws.onmessage = async e => {
         try {

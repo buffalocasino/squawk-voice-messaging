@@ -10,6 +10,7 @@ wss.on('connection', (ws) => {
     if (msg.type === 'register') {
       myId = msg.peerId;
       peers.set(myId, { ws, keyBundle: msg.keyBundle });
+      console.log('REGISTER', myId, 'peers:', peers.size);
       const list = [];
       for (const [id, p] of peers) if (id !== myId) list.push({ peerId: id, keyBundle: p.keyBundle });
       ws.send(JSON.stringify({ type: 'peer_list', peers: list }));
@@ -19,13 +20,14 @@ wss.on('connection', (ws) => {
       }
       return;
     }
-    if (['offer','answer','ice','prekey_request','prekey_response','olm_prekey','olm_message'].includes(msg.type)) {
+    if (['offer','answer','ice','prekey_request','prekey_response'].includes(msg.type)) {
+      console.log('RELAY', msg.type, 'from', myId, 'to', msg.to, 'found:', peers.has(msg.to));
       const t = peers.get(msg.to);
       if (t && t.ws.readyState === 1) t.ws.send(JSON.stringify({ ...msg, from: myId }));
     }
   });
   ws.on('close', () => {
-    if (myId) { peers.delete(myId); for (const [,p] of peers) if (p.ws.readyState===1) p.ws.send(JSON.stringify({type:'peer_offline',peerId:myId})); }
+    if (myId) { peers.delete(myId); console.log('DISCONNECT', myId, 'peers:', peers.size); for (const [,p] of peers) if (p.ws.readyState===1) p.ws.send(JSON.stringify({type:'peer_offline',peerId:myId})); }
   });
 });
 setInterval(() => {}, 5000);
