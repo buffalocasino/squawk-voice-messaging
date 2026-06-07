@@ -17,6 +17,8 @@
   import VideoRecorder from './lib/components/VideoRecorder.svelte'
   import VideoPlayer from './lib/components/VideoPlayer.svelte'
   import { playSend, playReceive } from './lib/audio/SoundEngine.js'
+  import SafetyNumber from './lib/components/SafetyNumber.svelte'
+  import QRCodePair from './lib/components/QRCodePair.svelte'
   import { pageSlide, bubblePop, ripple, springScale } from './lib/motion/SquawkMotion.js'
   import { fade, fly, scale } from 'svelte/transition'
   import { cubicOut } from 'svelte/easing'
@@ -26,10 +28,11 @@
   let virtualList = $state(null)
   let appReady = $state(false)
   let sidebarOpen = $state(false)
-  let mobileTab = $state('chats')           // 'chats' | 'settings' for bottom nav
+  let mobileTab = $state('chats')
+  let showQR = $state(false)           // 'chats' | 'settings' for bottom nav
   let peerCallInput = $state('')
   let copyFeedback = $state(false)
-  let expiredIds = $state(new Set())    // reactive set of recently expired msg IDs
+  let expiredIds = $state(new Set())
   let viewOnceWipes = $state(new Map()) // msgId → cancel function
 
   // Reference to PeerConnection's callPeer
@@ -443,6 +446,17 @@
     />
   </div>
 </div>
+
+{#if showQR}
+  <QRCodePair keyBundle={{ peerId: $myPeerId }} mode="show" onClose={() => showQR = false} />
+{/if}
+
+{#if persistentSelectedContact.current}
+  <SafetyNumber
+    peerName={persistentSelectedContact.current.name || persistentSelectedContact.current.id}
+    onClose={() => {}}
+  />
+{/if}
 
 <style>
   .app-shell {
