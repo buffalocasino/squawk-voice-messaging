@@ -9,15 +9,16 @@ let wasmReady = false
 export async function initOlm() {
   if (wasmReady) return olm
 
-  // Try the CJS global first (some builds expose window.Olm)
+  // Loaded via <script> tag — available as window.Olm immediately
   if (typeof window !== 'undefined' && window.Olm) {
+    await window.Olm.init()
     olm = window.Olm
-    await olm.init()
     wasmReady = true
+    console.log('[olm] loaded via script tag global')
     return olm
   }
 
-  // Dynamic import — Vite wraps CJS modules, try multiple access patterns
+  // Fallback: dynamic import for production builds
   const mod = await import('@matrix-org/olm')
   const Olm = mod.default || mod.Olm || mod
 
