@@ -21,6 +21,7 @@
   let sidebarOpen = $state(false)
   let mobileTab = $state('chats')           // 'chats' | 'settings' for bottom nav
   let peerCallInput = $state('')
+  let copyFeedback = $state(false)
   let expiredIds = $state(new Set())    // reactive set of recently expired msg IDs
   let viewOnceWipes = $state(new Map()) // msgId → cancel function
 
@@ -144,6 +145,25 @@
     console.log(`[End Chat] Wiped ${count} messages`)
   }
 
+  function copyPeerId() {
+    const id = $myPeerId
+    if (!id) return
+    try {
+      navigator.clipboard.writeText(id)
+    } catch {
+      // Fallback for non-HTTPS / older browsers
+      const el = document.createElement('textarea')
+      el.value = id
+      el.style.position = 'fixed'; el.style.opacity = '0'
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
+    copyFeedback = true
+    setTimeout(() => copyFeedback = false, 1500)
+  }
+
   function relTime(ts) { const d = Date.now() - ts; if (d < 60000) return 'now'; if (d < 3600000) return `${Math.floor(d/60000)}m`; if (d < 86400000) return `${Math.floor(d/3600000)}h`; return new Date(ts).toLocaleDateString() }
 </script>
 
@@ -239,10 +259,13 @@
           <div class="welcome-peer-id">
             <span class="welcome-peer-label">Your Peer ID</span>
             <code class="welcome-peer-code">{$myPeerId}</code>
-            <button class="copy-id-btn" onclick={() => { navigator.clipboard.writeText($myPeerId) }} title="Copy Peer ID">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              Copy
-            </button>
+            <button class="copy-id-btn" onclick={copyPeerId} title="Copy Peer ID">
+              {#if copyFeedback}
+                ✓ Copied!
+              {:else}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy
+              {/if}
           </div>
         {/if}
         <div class="welcome-actions">
