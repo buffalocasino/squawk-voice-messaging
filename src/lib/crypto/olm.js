@@ -49,10 +49,10 @@ export async function generateIdentityKeys() {
 
   // Creating a new Account automatically generates the Ed25519 identity key pair
   const account = new olm.Account()
-  account.generateOneTimeKeys(1) // also ensures identity keys are generated
+  account.generate_one_time_keys(1) // also ensures identity keys are generated
 
   // Extract key material and validate structure
-  const ik = JSON.parse(account.identityKeys())
+  const ik = JSON.parse(account.identity_keys())
   const ed25519Key = ik.ed25519 || null
   const curve25519Key = ik.curve25519 || null
   if (!ed25519Key || !curve25519Key) {
@@ -109,8 +109,8 @@ function unpickleAccount() {
 export async function publishOneTimeKeys(count = 1) {
   await initOlm()
   const { account, identity } = unpickleAccount()
-  account.generateOneTimeKeys(count)
-  const raw = account.getOneTimeKeys()
+  account.generate_one_time_keys(count)
+  const raw = account.get_one_time_keys()
   identity.pickled = account.pickle({ pickleKey: 'squawk-local-key' })
   saveIdentityKeys(identity)
   account.free()
