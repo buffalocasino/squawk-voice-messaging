@@ -9,28 +9,29 @@ let wasmReady = false
 export async function initOlm() {
   if (wasmReady) return olm
 
-  // Loaded via <script> tag — available as window.Olm immediately
-  if (typeof window !== 'undefined' && window.Olm) {
-    await window.Olm.init()
-    olm = window.Olm
+  // Loaded via <script> tag — may need a tick for IIFE to execute
+  for (let i = 0; i < 50; i++) {
+    if (typeof window !== 'undefined' && window.Olm) {
+      await window.Olm.init()
+      olm = window.Olm
+      wasmReady = true
+      console.log('[olm] loaded via script tag')
+      return olm
+    }
+    await new Promise(r => setTimeout(r, 100))
+  }
+
+  // Fallback: dynamic import
+  const mod = await import('@matrix-org/olm')
+  const Olm = mod.default || mod.Olm || mod
+  if (Olm && typeof Olm.init === 'function') {
+    await Olm.init()
+    olm = Olm
     wasmReady = true
-    console.log('[olm] loaded via script tag global')
     return olm
   }
 
-  // Fallback: dynamic import for production builds
-  const mod = await import('@matrix-org/olm')
-  const Olm = mod.default || mod.Olm || mod
-
-  if (!Olm || typeof Olm.init !== 'function') {
-    console.error('[olm] Import result:', Object.keys(mod))
-    throw new Error('Olm failed to load — no init() found on import')
-  }
-
-  await Olm.init()
-  olm = Olm
-  wasmReady = true
-  return olm
+  throw new Error('Olm failed to load after 5s')
 }
 
 export function isOlmReady() {
