@@ -9,6 +9,7 @@
   import Settings from './lib/Settings.svelte'
   import VirtualList from './lib/components/VirtualList.svelte'
   import { onMount } from 'svelte'
+  import { get } from 'svelte/store'
   import { stampWithConfig, onRead, startSweep, stopSweep, endChat, getExpiry, formatExpiry } from './lib/ephemeral/timerEngine.js'
   import ViewOnceOverlay from './lib/components/ViewOnceOverlay.svelte'
   import BottomNav from './lib/components/BottomNav.svelte'
@@ -146,12 +147,11 @@
   }
 
   function copyPeerId() {
-    const id = $myPeerId
+    const id = get(myPeerId)
     if (!id) return
     try {
       navigator.clipboard.writeText(id)
     } catch {
-      // Fallback for non-HTTPS / older browsers
       const el = document.createElement('textarea')
       el.value = id
       el.style.position = 'fixed'; el.style.opacity = '0'
