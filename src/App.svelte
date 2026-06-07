@@ -14,6 +14,8 @@
   import ViewOnceOverlay from './lib/components/ViewOnceOverlay.svelte'
   import BottomNav from './lib/components/BottomNav.svelte'
   import EphemeralSettings from './lib/components/EphemeralSettings.svelte'
+  import VideoRecorder from './lib/components/VideoRecorder.svelte'
+  import VideoPlayer from './lib/components/VideoPlayer.svelte'
   import { playSend, playReceive } from './lib/audio/SoundEngine.js'
 
   let currentView = $state('contacts')
@@ -115,6 +117,22 @@
     }
     persistentMessages.update(id, { status: 'sent' })
   }
+
+  async function handleRecordedVideo(blob, duration) {
+    const contact = persistentSelectedContact.current
+    if (!contact) return
+    const buf = await blob.arrayBuffer()
+    const b64 = btoa(String.fromCharCode(...new Uint8Array(buf)))
+    const id = Date.now()
+    const msg = { id, type: 'video', videoUrl: b64, duration, from: 'me', to: contact.id, time: Date.now(), status: 'sending' }
+    stampWithConfig(msg)
+    persistentMessages.add(msg)
+    trackBlobUrl(id, `data:video/webm;base64,${b64}`)
+    playSend()
+    if (sender) {
+      try { await sender(msg) } catch {}
+    }
+    persistentMessages.update(id, { status: 'sent' })
 
   async function handleRecordedAudio(blob, duration) {
     const contact = persistentSelectedContact.current
@@ -330,6 +348,7 @@
                 {#snippet children()}
                   <div class="msg-bubble view-once-bubble">
                     {#if msg.type === 'audio'}<AudioPlayer src={msg.audioUrl} duration={msg.duration || 0} />
+                    {:else if msg.type === 'video'}<VideoPlayer src={msg.videoUrl} duration={msg.duration || 0} />
                     {:else}<span class="msg-text">{msg.text}</span>{/if}
                   </div>
                 {/snippet}
@@ -340,6 +359,8 @@
             <div class="msg-bubble" class:me={isMe}>
               {#if msg.type === 'audio'}
                 <AudioPlayer src={msg.audioUrl} duration={msg.duration || 0} />
+              {:else if msg.type === 'video'}
+                <VideoPlayer src={msg.videoUrl} duration={msg.duration || 0} />
               {:else}
                 <span class="msg-text">{msg.text}</span>
               {/if}
@@ -369,6 +390,7 @@
 
       <!-- Input bar -->
       <div class="input-bar glass">
+        <VideoRecorder onSendVideo={handleRecordedVideo} />
         <Recorder onSendAudio={handleRecordedAudio} />
         <div class="input-wrapper">
           <input
