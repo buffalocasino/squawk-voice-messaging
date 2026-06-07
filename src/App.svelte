@@ -133,6 +133,7 @@
       try { await sender(msg) } catch {}
     }
     persistentMessages.update(id, { status: 'sent' })
+  }
 
   async function handleRecordedAudio(blob, duration) {
     const contact = persistentSelectedContact.current
