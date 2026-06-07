@@ -167,3 +167,9 @@ export async function loadOrCreateIdentityKeys() {
     pickled: 'v2',
   }
 }
+
+export function loadIdentityKeys() {
+  return loadOrCreateIdentityKeys()
+}
+
+export function saveIdentityKeys() {}
